@@ -1,0 +1,48 @@
+{% extends 'game/base.html' %}
+
+{% block title %}Jual Lele{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card p-5">
+        <h2 class="text-center mb-4">Panen & Jual Lele</h2>
+        
+        {% if siap_panen %}
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label class="form-label">Pilih Siklus yang Siap Panen</label>
+            <select name="siklus" class="form-select form-select-lg" required>
+              <option value="">-- Pilih Siklus --</option>
+              {% for siklus in siap_panen %}
+              <option value="{{ siklus.id }}">
+                {{ siklus.kolam.nama }} - {{ siklus.jumlah_benih }} ekor ({{ siklus.ukuran_benih_cm|floatformat:1 }}cm)
+              </option>
+              {% endfor %}
+            </select>
+            <small class="text-muted">Ukuran ideal panen: 9-12 ekor/kg atau 2.5-3.5 bulan [citation:10]</small>
+          </div>
+          
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-success btn-lg">
+              <i class="bi bi-cash"></i> Panen & Jual
+            </button>
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Batal</a>
+          </div>
+        </form>
+        {% else %}
+        <div class="text-center py-5">
+          <i class="bi bi-emoji-frown display-1 text-muted"></i>
+          <h4 class="mt-3">Belum ada lele yang siap panen</h4>
+          <p class="text-muted">Siklus budidaya biasanya memakan waktu 2.5-3.5 bulan [citation:10]</p>
+          <a href="{% url 'dashboard' %}" class="btn btn-custom mt-3">Kembali ke Dashboard</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

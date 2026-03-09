@@ -1,0 +1,62 @@
+{% extends 'game/base.html' %}
+
+{% block title %}Home - Simulasi Ternak Lele{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row min-vh-100 align-items-center">
+    <div class="col-md-6">
+      <h1 class="display-4 fw-bold text-white">Game Ternak Lele</h1>
+      <p class="lead text-white">Simulasi budidaya ikan lele yang realistis. Pelajari siklus pembenihan, pendederan, dan pembesaran lele sambil mengelola bisnis!</p>
+      
+      {% if not user.is_authenticated %}
+      <div class="mt-4">
+        <a href="{% url 'register' %}" class="btn btn-custom btn-lg me-3">
+          <i class="bi bi-person-plus"></i> Daftar Sekarang
+        </a>
+        <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">
+          <i class="bi bi-box-arrow-in-right"></i> Login
+        </a>
+      </div>
+      {% else %}
+      <div class="mt-4">
+        <a href="{% url 'dashboard' %}" class="btn btn-custom btn-lg">
+          <i class="bi bi-house-door"></i> Ke Dashboard
+        </a>
+      </div>
+      {% endif %}
+    </div>
+    
+    <div class="col-md-6">
+      <div class="card p-4">
+        <h3 class="text-center mb-4">Tahapan Budidaya Lele [citation:1]</h3>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="text-center">
+              <i class="bi bi-egg-fried display-4 text-primary"></i>
+              <h5>Pembenihan</h5>
+              <small>Menghasilkan benih berkualitas</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="text-center">
+              <i class="bi bi-arrow-up-short display-4 text-success"></i>
+              <h5>Pendederan</h5>
+              <small>Memelihara benih 1-12 cm</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="text-center">
+              <i class="bi bi-basket display-4 text-warning"></i>
+              <h5>Pembesaran</h5>
+              <small>Panen ukuran konsumsi</small>
+            </div>
+          </div>
+        </div>
+        <hr class="my-4">
+        <p class="text-muted text-center">Modal awal: Rp100.000 | Siklus panen: 2.5-3.5 bulan [citation:10]</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

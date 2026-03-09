@@ -1,0 +1,52 @@
+{% extends 'game/base.html' %}
+
+{% block title %}Beli Benih Lele{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card p-5">
+        <h2 class="text-center mb-4">Beli Benih Lele</h2>
+        
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label class="form-label">Pilih Kolam</label>
+            <select name="kolam" class="form-select form-select-lg" required>
+              <option value="">-- Pilih Kolam --</option>
+              {% for kolam in kolams %}
+              <option value="{{ kolam.id }}">{{ kolam.nama }} (Kapasitas: {{ kolam.kapasitas_maksimal }} ekor)</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Ukuran Benih</label>
+            <select name="ukuran" class="form-select form-select-lg" required>
+              <option value="kecil">Kecil (1-3 cm) - Rp200/ekor, panen 30 hari</option>
+              <option value="sedang">Sedang (3-5 cm) - Rp500/ekor, panen 20 hari</option>
+              <option value="besar">Besar (5-8 cm) - Rp1000/ekor, panen 15 hari</option>
+            </select>
+            <small class="text-muted">Berdasarkan tahapan budidaya: pendederan 1, 2, dan 3 [citation:1]</small>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Jumlah Benih</label>
+            <input type="number" name="jumlah" class="form-control form-control-lg" min="10" max="2000" required>
+            <small class="text-muted">Kepadatan ideal: 200-400 ekor/m² [citation:10]</small>
+          </div>
+          
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-custom btn-lg">
+              <i class="bi bi-cart-check"></i> Beli Sekarang
+            </button>
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Batal</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

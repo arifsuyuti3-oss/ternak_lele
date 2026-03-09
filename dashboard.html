@@ -1,0 +1,197 @@
+{% extends 'game/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Info Pengguna -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card bg-primary text-white p-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h2 class="mb-0">Halo, {{ user.username }}!</h2>
+            <p class="mb-0">Level {{ profil.level }} | Pengalaman: {{ profil.pengalaman }}</p>
+          </div>
+          <div class="text-end">
+            <h3 class="mb-0">Rp {{ profil.uang|floatformat:0 }}</h3>
+            <small>Total Panen: {{ profil.total_panen }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Statistik -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card text-center p-4">
+        <i class="bi bi-fish display-4 text-primary"></i>
+        <h3>{{ total_lele }}</h3>
+        <p class="text-muted">Total Lele Aktif</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center p-4">
+        <i class="bi bi-water display-4 text-success"></i>
+        <h3>{{ kolams|length }}</h3>
+        <p class="text-muted">Kolam Aktif</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center p-4">
+        <i class="bi bi-calendar-check display-4 text-warning"></i>
+        <h3>{{ siklus_aktif|length }}</h3>
+        <p class="text-muted">Siklus Aktif</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Aksi Cepat -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card p-4">
+        <h4 class="mb-3">Aksi Cepat</h4>
+        <div class="d-flex gap-3 flex-wrap">
+          <a href="{% url 'beli_benih' %}" class="btn btn-primary">
+            <i class="bi bi-cart-plus"></i> Beli Benih
+          </a>
+          <a href="{% url 'jual_lele' %}" class="btn btn-success">
+            <i class="bi bi-cash-stack"></i> Jual Lele
+          </a>
+          <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#pakanModal">
+            <i class="bi bi-cup-straw"></i> Beri Pakan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal Beri Pakan -->
+  <div class="modal fade" id="pakanModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form method="post" action="{% url 'beri_pakan' %}">
+          {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title">Beri Pakan Lele</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Pilih Siklus</label>
+              <select name="siklus" class="form-select" required>
+                <option value="">-- Pilih Siklus --</option>
+                {% for siklus in siklus_aktif %}
+                <option value="{{ siklus.id }}">
+                  {{ siklus.kolam.nama }} - {{ siklus.jumlah_benih }} ekor ({{ siklus.ukuran_benih_cm|floatformat:1 }}cm)
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Jumlah Pakan (kg)</label>
+              <input type="number" name="jumlah_pakan" class="form-control" min="0.5" step="0.5" required>
+              <small class="text-muted">Harga pakan: Rp10.000/kg</small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-primary">Beri Pakan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Daftar Siklus Aktif -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card p-4">
+        <h4 class="mb-3">Siklus Aktif</h4>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Kolam</th>
+                <th>Jumlah</th>
+                <th>Ukuran (cm)</th>
+                <th>Pakan (kg)</th>
+                <th>Target Panen</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for siklus in siklus_aktif %}
+              <tr>
+                <td>{{ siklus.kolam.nama }}</td>
+                <td>{{ siklus.jumlah_benih }} ekor</td>
+                <td>{{ siklus.ukuran_benih_cm|floatformat:1 }}</td>
+                <td>{{ siklus.jumlah_pakan_kg }}</td>
+                <td>{{ siklus.target_panen }}</td>
+                <td>
+                  {% if siklus.target_panen <= today %}
+                  <span class="badge bg-success">Siap Panen</span>
+                  {% else %}
+                  <span class="badge bg-warning">Dalam Perawatan</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" class="text-center">Belum ada siklus aktif. Mulai dengan membeli benih!</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Riwayat Transaksi -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card p-4">
+        <h4 class="mb-3">Transaksi Terakhir</h4>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Jenis</th>
+                <th>Jumlah</th>
+                <th>Total</th>
+                <th>Keterangan</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for trans in transaksis %}
+              <tr>
+                <td>{{ trans.tanggal|date:"d M Y H:i" }}</td>
+                <td>
+                  {% if trans.jenis == 'beli_benih' %}
+                  <span class="badge bg-info">Beli Benih</span>
+                  {% elif trans.jenis == 'beli_pakan' %}
+                  <span class="badge bg-warning">Beli Pakan</span>
+                  {% else %}
+                  <span class="badge bg-success">Jual Lele</span>
+                  {% endif %}
+                </td>
+                <td>{{ trans.jumlah }}</td>
+                <td>Rp {{ trans.total_harga|floatformat:0 }}</td>
+                <td>{{ trans.keterangan }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" class="text-center">Belum ada transaksi</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
